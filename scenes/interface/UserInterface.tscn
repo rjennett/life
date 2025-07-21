@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://c4jvltopp813c"]
+
+[node name="UserInterface" type="Node2D"]
+
+[node name="PlayButton" type="Button" parent="."]
+offset_top = 169.0
+offset_right = 18.0
+offset_bottom = 200.0
+text = ">"
+
+[node name="PauseButton" type="Button" parent="."]
+offset_left = 19.0
+offset_top = 169.0
+offset_right = 45.0
+offset_bottom = 200.0
+text = "||"
+
+[node name="ResetButton" type="Button" parent="."]
+offset_left = 46.0
+offset_top = 169.0
+offset_right = 63.0
+offset_bottom = 200.0
+text = "x"
+
+[node name="GenerationDisplay" type="RichTextLabel" parent="."]
+offset_left = 120.0
+offset_top = 160.0
+offset_right = 160.0
+offset_bottom = 200.0
