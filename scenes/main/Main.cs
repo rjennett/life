@@ -20,11 +20,18 @@ public partial class Main : Node2D
     {
         base._UnhandledInput(evt);
 
-        if (evt.IsActionPressed("left click"))
+        if (evt.IsActionPressed("left click") && !gridManager.IsTileAlive(gridManager.GetMouseGridCellPosition()))
         {
             PlaceLifeAtHoveredCellPosition();
+            GD.Print("if");
+        }
+        else if (evt.IsActionPressed("left click") && gridManager.IsTileAlive(gridManager.GetMouseGridCellPosition()))
+        {
+            RemoveLifeAtHoveredCellPosition();
+            GD.Print("else");
         }
     }
+    
 
 
     public override void _Process(double delta)
@@ -41,12 +48,23 @@ public partial class Main : Node2D
         var life = lifeScene.Instantiate<Node2D>();
         AddChild(life);
 
+        // Position converted to global values
         life.GlobalPosition = hoveredGridCell.Value * 16;
+        // Pass local position to store in life dictionary
+        gridManager.MarkTileAsAlive(hoveredGridCell.Value, life);
     }
 
     private void RemoveLifeAtHoveredCellPosition()
     {
         // TODO: remove and free any life that existed in clicked cell if clicked again
+        var key = hoveredGridCell.Value;
+        if (gridManager.gridLife.ContainsKey(key))
+        {
+            Node2D life = gridManager.gridLife[key];
+            life.QueueFree();
+            gridManager.gridLife.Remove(key);
+            gridManager.MarkTileAsDead(key);
+        }
     }
 
 }
