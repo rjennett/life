@@ -23,12 +23,10 @@ public partial class Main : Node2D
         if (evt.IsActionPressed("left click") && !gridManager.IsTileAlive(gridManager.GetMouseGridCellPosition()))
         {
             PlaceLifeAtHoveredCellPosition();
-            GD.Print("if");
         }
         else if (evt.IsActionPressed("left click") && gridManager.IsTileAlive(gridManager.GetMouseGridCellPosition()))
         {
             RemoveLifeAtHoveredCellPosition();
-            GD.Print("else");
         }
     }
     

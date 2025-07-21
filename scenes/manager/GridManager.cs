@@ -27,15 +27,6 @@ public partial class GridManager : Node2D
     // Check for life
     public bool IsTileAlive(Vector2I tilePosition)
     {
-        
-        GD.Print(String.Join(",", occupiedCells));
-        foreach (KeyValuePair<Vector2I, Node2D> kvp in gridLife)
-        {
-            GD.Print(kvp.Key, kvp.Value);
-        }
-        GD.Print(occupiedCells.Contains(tilePosition));
-        GD.Print(tilePosition);
-
         return occupiedCells.Contains(tilePosition);
     }
 
