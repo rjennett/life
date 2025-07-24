@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+namespace Manager.GridManager;
+
 public partial class GridManager : Node2D
 {
     // Hashset to track living cells
@@ -41,4 +43,75 @@ public partial class GridManager : Node2D
     {
         occupiedCells.Remove(tilePosition);
     }
+
+    #region Life Management
+    public void IterateLifeGrid()
+    {
+        // Iterate grid
+        for (int i = 0; i < baseTerrainTileMapLayer.GetUsedRect().Size.X; i++)
+        {
+            for (int j = 0; j < baseTerrainTileMapLayer.GetUsedRect().Size.Y; j++)
+            {
+                Vector2I position = new Vector2I(i, j);
+                AssessNeighbors(position);
+                // IterateGeneration();
+            }
+
+        }
+    }
+
+    // Check neighbors for life
+    public void AssessNeighbors(Vector2I currentGridPosition)
+    {
+        // Neighbor cell positions
+        GD.Print("Judging neighbors...");
+
+        // Iterate all 8 neighbors to be evaluated
+        List<TileSet.CellNeighbor> neighbors = [
+            TileSet.CellNeighbor.RightSide,
+            TileSet.CellNeighbor.BottomRightCorner,
+            TileSet.CellNeighbor.BottomSide,
+            TileSet.CellNeighbor.BottomLeftCorner,
+            TileSet.CellNeighbor.LeftSide,
+            TileSet.CellNeighbor.TopLeftCorner,
+            TileSet.CellNeighbor.TopSide,
+            TileSet.CellNeighbor.TopRightCorner
+        ];
+
+        foreach (TileSet.CellNeighbor neighbor in neighbors)
+        {
+            var cell = baseTerrainTileMapLayer.GetNeighborCell(currentGridPosition, neighbor);
+
+            // Is the neighbor alive?
+            if (IsTileAlive(cell))
+            {
+                GD.Print($"Neighbor {neighbor} Lives!");
+                // Add to list of living neighbor locations/coords
+                // Increment count of living neighbors
+            }
+        }
+
+
+    }
+
+    // Change state
+    public void CalculateNextGeneration()
+    {
+
+    }
+
+    // TODO: likely remove; this function performed by timer
+    public void IterateGeneration()
+    {
+        bool progress = true;
+        int generation = 0;
+        while (progress)
+        {
+            // TODO: Delay speed of iteration based on UI slider
+
+            generation++;
+            // generationDisplay.Text = generation.ToString();
+        }
+    }
+    #endregion
 }

@@ -1,11 +1,14 @@
 using Godot;
 using System;
+using Manager.GridManager;
 
 public partial class Main : Node2D
 {
     private PackedScene lifeScene;
     private GridManager gridManager;
     private Vector2I? hoveredGridCell;
+    private Button playButton;
+    private Timer lifeTimer;
 
     public override void _Ready()
     {
@@ -14,6 +17,12 @@ public partial class Main : Node2D
         // Initialize scenes and nodes to be accessed programmatically
         lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
         gridManager = GetNode<GridManager>("GridManager");
+        playButton = GetNode<Button>("UserInterface/PlayButton");
+        lifeTimer = GetNode<Timer>("LifeTimer");
+        
+
+        playButton.Pressed += () => lifeTimer.Start();
+        lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
     }
 
     public override void _UnhandledInput(InputEvent evt)
@@ -31,7 +40,7 @@ public partial class Main : Node2D
     }
     
 
-
+    // Executes every frame
     public override void _Process(double delta)
     {
         base._Process(delta);
@@ -41,6 +50,7 @@ public partial class Main : Node2D
 
     }
 
+    // TODO: refactor to place life at argument position for use elsewhere
     private void PlaceLifeAtHoveredCellPosition()
     {
         var life = lifeScene.Instantiate<Node2D>();
