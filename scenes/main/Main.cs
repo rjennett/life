@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using Manager.GridManager;
 
 public partial class Main : Node2D
 {
@@ -19,7 +18,6 @@ public partial class Main : Node2D
         gridManager = GetNode<GridManager>("GridManager");
         playButton = GetNode<Button>("UserInterface/PlayButton");
         lifeTimer = GetNode<Timer>("LifeTimer");
-        
 
         playButton.Pressed += () => lifeTimer.Start();
         lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
@@ -29,6 +27,7 @@ public partial class Main : Node2D
     {
         base._UnhandledInput(evt);
 
+        // Handle clicks to place and remove life
         if (evt.IsActionPressed("left click") && !gridManager.IsTileAlive(gridManager.GetMouseGridCellPosition()))
         {
             PlaceLifeAtHoveredCellPosition();
@@ -50,7 +49,7 @@ public partial class Main : Node2D
 
     }
 
-    // TODO: refactor to place life at argument position for use elsewhere
+        // TODO: refactor to place life at argument position for use elsewhere
     private void PlaceLifeAtHoveredCellPosition()
     {
         var life = lifeScene.Instantiate<Node2D>();
