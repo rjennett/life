@@ -63,7 +63,7 @@ public partial class GridManager : Node2D
             for (int j = 0; j < baseTerrainTileMapLayer.GetUsedRect().Size.Y; j++)
             {
                 Vector2I position = new Vector2I(i, j);
-                GD.Print("Position: ", position);
+                // GD.Print("Position: ", position);
                 int livingNeighbors = AssessNeighbors(position);
                 CalculateNextGeneration(livingNeighbors, position);
             }
@@ -75,7 +75,7 @@ public partial class GridManager : Node2D
     public int AssessNeighbors(Vector2I currentGridPosition)
     {
         // Neighbor cell positions
-        GD.Print("Judging neighbors...");
+        // GD.Print("Judging neighbors...");
 
         // Iterate all 8 neighbors to be evaluated
         List<TileSet.CellNeighbor> neighbors = [
@@ -97,14 +97,14 @@ public partial class GridManager : Node2D
             // Is the neighbor alive?
             if (IsTileAlive(cell))
             {
-                GD.Print($"Neighbor {neighbor} Lives!");
+                // GD.Print($"Neighbor {neighbor} Lives!");
                 // Add to list of living neighbor locations/coords
                 // Increment count of living neighbors
                 livingNeighbors++;
             }
         }
 
-        GD.Print("Living neighbors: ", livingNeighbors);
+        // GD.Print("Living neighbors: ", livingNeighbors);
 
         return livingNeighbors;
 
@@ -113,35 +113,35 @@ public partial class GridManager : Node2D
     // Change state
     public void CalculateNextGeneration(int countLivingNeighbors, Vector2I selfCoord)
     {
-        GD.Print("selfCoord: ", selfCoord);
-        GD.Print("Living neighbors: ", countLivingNeighbors);
-        GD.Print("Tile is alive?: ", IsTileAlive(selfCoord));
+        // GD.Print("selfCoord: ", selfCoord);
+        // GD.Print("Living neighbors: ", countLivingNeighbors);
+        // GD.Print("Tile is alive?: ", IsTileAlive(selfCoord));
         // Rules for life
         // if dead && livingNeighbors == 3: become alive
         if (!IsTileAlive(selfCoord) && (countLivingNeighbors == 3))
         // if (!IsTileAlive(selfCoord))
         {
             PlaceLifeAtPosition(selfCoord);
-            GD.Print("Condition 1");
+            // GD.Print("Condition 1");
         }
         // if alive && livingNeighbors == 2 or 3: remain alive
         else if (IsTileAlive(selfCoord) && ((countLivingNeighbors == 2) || (countLivingNeighbors == 3)))
         {
             // Condition does nothing?
-            GD.Print("Condition 2");
+            // GD.Print("Condition 2");
             return;
         }
         // if alive && livingNeighbors < 2: die
         else if (IsTileAlive(selfCoord) && (countLivingNeighbors < 2))
         {
             RemoveLifeAtPosition(selfCoord);
-            GD.Print("Condition 3");
+            // GD.Print("Condition 3");
         }
         // if alive && livingNeighbors > 3: die
         else if (IsTileAlive(selfCoord) && (countLivingNeighbors > 3))
         {
             RemoveLifeAtPosition(selfCoord);
-            GD.Print("Condition 4");
+            // GD.Print("Condition 4");
         }
 
     }
