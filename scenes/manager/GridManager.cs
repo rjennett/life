@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 
 public partial class GridManager : Node2D
 {
@@ -15,6 +16,8 @@ public partial class GridManager : Node2D
 
     private PackedScene lifeScene;
     private Node2D mainNode;
+    private List<Vector2I> nextGenerationLifeCoords = new();
+    private List<Vector2I> nextGenerationDeathCoords = new();
 
     [Export]
     private TileMapLayer baseTerrainTileMapLayer;
@@ -67,8 +70,9 @@ public partial class GridManager : Node2D
                 int livingNeighbors = AssessNeighbors(position);
                 CalculateNextGeneration(livingNeighbors, position);
             }
-
         }
+        
+        UpdateGeneration();
     }
 
     // Check neighbors for life
@@ -116,12 +120,14 @@ public partial class GridManager : Node2D
         // GD.Print("selfCoord: ", selfCoord);
         // GD.Print("Living neighbors: ", countLivingNeighbors);
         // GD.Print("Tile is alive?: ", IsTileAlive(selfCoord));
+
         // Rules for life
         // if dead && livingNeighbors == 3: become alive
         if (!IsTileAlive(selfCoord) && (countLivingNeighbors == 3))
         // if (!IsTileAlive(selfCoord))
         {
-            PlaceLifeAtPosition(selfCoord);
+            GD.Print(selfCoord);
+            nextGenerationLifeCoords.Add(selfCoord);
             // GD.Print("Condition 1");
         }
         // if alive && livingNeighbors == 2 or 3: remain alive
@@ -134,20 +140,36 @@ public partial class GridManager : Node2D
         // if alive && livingNeighbors < 2: die
         else if (IsTileAlive(selfCoord) && (countLivingNeighbors < 2))
         {
-            RemoveLifeAtPosition(selfCoord);
+            nextGenerationDeathCoords.Add(selfCoord);
             // GD.Print("Condition 3");
         }
         // if alive && livingNeighbors > 3: die
         else if (IsTileAlive(selfCoord) && (countLivingNeighbors > 3))
         {
-            RemoveLifeAtPosition(selfCoord);
+            nextGenerationDeathCoords.Add(selfCoord);
             // GD.Print("Condition 4");
         }
 
     }
 
+    private void UpdateGeneration()
+    {
+        foreach (Vector2I coord in nextGenerationLifeCoords)
+        {
+            PlaceLifeAtPosition(coord);
+        }
+
+        foreach (Vector2I coord in nextGenerationDeathCoords)
+        {
+            RemoveLifeAtPosition(coord);
+        }
+
+        nextGenerationLifeCoords.Clear();
+        nextGenerationDeathCoords.Clear();
+    }
+
     // TODO: likely remove; this function performed by timer
-    public void IterateGeneration()
+    private void IterateGeneration()
     {
         bool progress = true;
         int generation = 0;
@@ -160,7 +182,7 @@ public partial class GridManager : Node2D
         }
     }
 
-    public void PlaceLifeAtPosition(Vector2I gridPosition)
+    private void PlaceLifeAtPosition(Vector2I gridPosition)
     {
         var life = lifeScene.Instantiate<Node2D>();
         mainNode.AddChild(life);
@@ -169,7 +191,7 @@ public partial class GridManager : Node2D
         MarkTileAsAlive(gridPosition, life);
     }
 
-    public void RemoveLifeAtPosition(Vector2I gridPosition)
+    private void RemoveLifeAtPosition(Vector2I gridPosition)
     {
         var key = gridPosition;
         if (gridLife.ContainsKey(key))
