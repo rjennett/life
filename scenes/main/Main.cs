@@ -4,10 +4,18 @@ using System;
 public partial class Main : Node2D
 {
     private PackedScene lifeScene;
+    private PackedScene lifeSceneSolitary;
+    private PackedScene lifeSceneSocial;
     private GridManager gridManager;
     private Vector2I? hoveredGridCell;
-    private Button playButton;
+    private Button buttonPlay;
+    private Button buttonPause;
+    private Button buttonReset;
+    private Button buttonAverage;
+    private Button buttonSolitary;
+    private Button buttonSocial;
     private Timer lifeTimer;
+    private string lifeType;
 
     public override void _Ready()
     {
@@ -15,11 +23,30 @@ public partial class Main : Node2D
 
         // Initialize scenes and nodes to be accessed programmatically
         lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
+        lifeSceneSolitary = GD.Load<PackedScene>("");
+        lifeSceneSocial = GD.Load<PackedScene>("");
         gridManager = GetNode<GridManager>("GridManager");
-        playButton = GetNode<Button>("UserInterface/PlayButton");
+        buttonPlay = GetNode<Button>("UiRoot/ButtonPlay");
+        buttonPause = GetNode<Button>("UiRoot/ButtonPause");
+        buttonReset = GetNode<Button>("UiRoot/ButtonReset");
+        buttonAverage = GetNode<Button>("UiRoot/ButtonAverage");
+        buttonSolitary = GetNode<Button>("UiRoot/ButtonSolitary");
+        buttonSocial = GetNode<Button>("UiRoot/ButtonSocial");
         lifeTimer = GetNode<Timer>("LifeTimer");
 
-        playButton.Pressed += () => lifeTimer.Start();
+        buttonPlay.Pressed += () =>
+        {
+            if (!lifeTimer.Paused)
+            {
+                lifeTimer.Start();
+            }
+            else
+            {
+                lifeTimer.Paused = false;
+            }
+        };
+        buttonPause.Pressed += () => lifeTimer.Paused = true;
+        buttonAverage.Pressed += () =>
         lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
     }
 
@@ -73,5 +100,14 @@ public partial class Main : Node2D
             gridManager.MarkTileAsDead(key);
         }
     }
+    
+    public void SetLifeType(string lifeType)
+    {
+        switch (lifeType)
+        {
+            case "Average":
 
+                break;
+        }
+    }
 }

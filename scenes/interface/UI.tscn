@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://dxdt6ht4qfdq1"]
+
+[node name="UiRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 640.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ButtonPlay" type="Button" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 40.0
+offset_right = 121.0
+offset_bottom = 71.0
+text = "Play"
+
+[node name="ButtonPause" type="Button" parent="."]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 40.0
+offset_right = 183.0
+offset_bottom = 71.0
+text = "Pause"
+
+[node name="ButtonReset" type="Button" parent="."]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 40.0
+offset_right = 243.0
+offset_bottom = 71.0
+text = "Reset"
+
+[node name="ButtonAverage" type="Button" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_right = 151.0
+offset_bottom = 31.0
+text = "Average"
+
+[node name="ButtonSolitary" type="Button" parent="."]
+layout_mode = 0
+offset_left = 160.0
+offset_right = 227.0
+offset_bottom = 31.0
+text = "Solitary"
+
+[node name="ButtonSocial" type="Button" parent="."]
+layout_mode = 0
+offset_left = 240.0
+offset_right = 293.0
+offset_bottom = 31.0
+text = "Social"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 24.0
+text = "Life Type:"

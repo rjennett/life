@@ -71,7 +71,7 @@ public partial class GridManager : Node2D
                 CalculateNextGeneration(livingNeighbors, position);
             }
         }
-        
+
         UpdateGeneration();
     }
 
