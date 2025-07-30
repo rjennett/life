@@ -3,6 +3,7 @@ using System;
 
 public partial class Main : Node2D
 {
+    private PackedScene lifeTypeToPlace;
     private PackedScene lifeScene;
     private PackedScene lifeSceneSolitary;
     private PackedScene lifeSceneSocial;
@@ -23,8 +24,8 @@ public partial class Main : Node2D
 
         // Initialize scenes and nodes to be accessed programmatically
         lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
-        lifeSceneSolitary = GD.Load<PackedScene>("");
-        lifeSceneSocial = GD.Load<PackedScene>("");
+        lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
+        lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
         gridManager = GetNode<GridManager>("GridManager");
         buttonPlay = GetNode<Button>("UiRoot/ButtonPlay");
         buttonPause = GetNode<Button>("UiRoot/ButtonPause");
@@ -34,6 +35,7 @@ public partial class Main : Node2D
         buttonSocial = GetNode<Button>("UiRoot/ButtonSocial");
         lifeTimer = GetNode<Timer>("LifeTimer");
 
+        // Control game timer
         buttonPlay.Pressed += () =>
         {
             if (!lifeTimer.Paused)
@@ -46,8 +48,13 @@ public partial class Main : Node2D
             }
         };
         buttonPause.Pressed += () => lifeTimer.Paused = true;
-        buttonAverage.Pressed += () =>
         lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
+
+        // Set type of life to be placed
+        buttonAverage.Pressed += () => lifeTypeToPlace = lifeScene;
+        buttonSolitary.Pressed += () => lifeTypeToPlace = lifeSceneSolitary;
+        buttonSocial.Pressed += () => lifeTypeToPlace = lifeSceneSocial;
+        
     }
 
     public override void _UnhandledInput(InputEvent evt)
@@ -76,10 +83,10 @@ public partial class Main : Node2D
 
     }
 
-        // TODO: refactor to place life at argument position for use elsewhere
+    // TODO: refactor to place life at argument position for use elsewhere
     private void PlaceLifeAtHoveredCellPosition()
     {
-        var life = lifeScene.Instantiate<Node2D>();
+        var life = lifeTypeToPlace.Instantiate<Node2D>();
         AddChild(life);
 
         // Position converted to global values

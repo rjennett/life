@@ -126,7 +126,7 @@ public partial class GridManager : Node2D
         if (!IsTileAlive(selfCoord) && (countLivingNeighbors == 3))
         // if (!IsTileAlive(selfCoord))
         {
-            GD.Print(selfCoord);
+            // GD.Print(selfCoord);
             nextGenerationLifeCoords.Add(selfCoord);
             // GD.Print("Condition 1");
         }
