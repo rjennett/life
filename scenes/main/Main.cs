@@ -8,6 +8,7 @@ public partial class Main : Node2D
     private PackedScene lifeSceneSolitary;
     private PackedScene lifeSceneSocial;
     private GridManager gridManager;
+    private LifeManager lifeManager;
     private Vector2I? hoveredGridCell;
     private Button buttonPlay;
     private Button buttonPause;
@@ -27,6 +28,7 @@ public partial class Main : Node2D
         lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
         lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
         gridManager = GetNode<GridManager>("GridManager");
+        lifeManager = GetNode<LifeManager>("GridManager/LifeManager");
         buttonPlay = GetNode<Button>("UiRoot/ButtonPlay");
         buttonPause = GetNode<Button>("UiRoot/ButtonPause");
         buttonReset = GetNode<Button>("UiRoot/ButtonReset");
@@ -87,7 +89,24 @@ public partial class Main : Node2D
     private void PlaceLifeAtHoveredCellPosition()
     {
         var life = lifeTypeToPlace.Instantiate<Node2D>();
-        AddChild(life);
+        lifeManager.AddChild(life);
+
+        if (lifeTypeToPlace == lifeScene)
+        {
+            life.AddToGroup("average");
+        }
+        else if (lifeTypeToPlace == lifeSceneSolitary)
+        {
+            life.AddToGroup("solitary");
+        }
+        else if (lifeTypeToPlace == lifeSceneSocial)
+        {
+            life.AddToGroup("social");
+        }
+        else
+        {
+            GD.Print("error with grouping");
+        }
 
         // Position converted to global values
         life.GlobalPosition = hoveredGridCell.Value * 16;
