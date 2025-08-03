@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://dufg436gnebuw" path="res://scenes/main/Main.cs" id="1_iuonh"]
 [ext_resource type="PackedScene" uid="uid://bv1eyc4iwj1j7" path="res://scenes/manager/GridManager.tscn" id="2_k2fmo"]
 [ext_resource type="PackedScene" uid="uid://3p0e3s5tikqb" path="res://scenes/manager/LifeManager.tscn" id="3_6q06x"]
-[ext_resource type="PackedScene" uid="uid://dxdt6ht4qfdq1" path="res://scenes/interface/UI.tscn" id="6_ow5a4"]
+[ext_resource type="PackedScene" uid="uid://bkv43111mcglw" path="res://scenes/interface/UI.tscn" id="6_ow5a4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_iuonh"]
 texture = ExtResource("1_hyk8p")

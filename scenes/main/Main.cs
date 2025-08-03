@@ -3,38 +3,52 @@ using System;
 
 public partial class Main : Node2D
 {
+    // Life scenes
     private PackedScene lifeTypeToPlace;
     private PackedScene lifeScene;
     private PackedScene lifeSceneSolitary;
     private PackedScene lifeSceneSocial;
+
+    // Managers
     private GridManager gridManager;
     private LifeManager lifeManager;
+
+    // Store cell coordinates of mouse position
     private Vector2I? hoveredGridCell;
+
+    // UI Buttons
     private Button buttonPlay;
     private Button buttonPause;
     private Button buttonReset;
     private Button buttonAverage;
     private Button buttonSolitary;
     private Button buttonSocial;
+
+    // Timer
     private Timer lifeTimer;
-    private string lifeType;
 
     public override void _Ready()
     {
         base._Ready();
 
         // Initialize scenes and nodes to be accessed programmatically
-        lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
+        lifeScene = GD.Load<PackedScene>("res://scenes/life/LifeAverage.tscn");
         lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
         lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
+
+        //Managers
         gridManager = GetNode<GridManager>("GridManager");
         lifeManager = GetNode<LifeManager>("GridManager/LifeManager");
+
+        // UI Buttons
         buttonPlay = GetNode<Button>("UiRoot/ButtonPlay");
         buttonPause = GetNode<Button>("UiRoot/ButtonPause");
         buttonReset = GetNode<Button>("UiRoot/ButtonReset");
         buttonAverage = GetNode<Button>("UiRoot/ButtonAverage");
         buttonSolitary = GetNode<Button>("UiRoot/ButtonSolitary");
         buttonSocial = GetNode<Button>("UiRoot/ButtonSocial");
+
+        // Timer to control generation iteration
         lifeTimer = GetNode<Timer>("LifeTimer");
 
         // Control game timer
@@ -50,7 +64,7 @@ public partial class Main : Node2D
             }
         };
         buttonPause.Pressed += () => lifeTimer.Paused = true;
-        lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
+        lifeTimer.Timeout += () => lifeManager.IterateLifeNodes();
 
         // Set type of life to be placed
         buttonAverage.Pressed += () => lifeTypeToPlace = lifeScene;
@@ -85,7 +99,6 @@ public partial class Main : Node2D
 
     }
 
-    // TODO: refactor to place life at argument position for use elsewhere
     private void PlaceLifeAtHoveredCellPosition()
     {
         var life = lifeTypeToPlace.Instantiate<Node2D>();
@@ -124,16 +137,6 @@ public partial class Main : Node2D
             life.QueueFree();
             gridManager.gridLife.Remove(key);
             gridManager.MarkTileAsDead(key);
-        }
-    }
-    
-    public void SetLifeType(string lifeType)
-    {
-        switch (lifeType)
-        {
-            case "Average":
-
-                break;
         }
     }
 }
