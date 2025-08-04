@@ -26,6 +26,11 @@ window/stretch/scale=2.0
 
 project/assembly_name="Life"
 
+[global_group]
+
+average="Groups average life"
+solitary="Groups solitary life"
+
 [input]
 
 "left click"={

@@ -1,32 +1,33 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading;
 
 public partial class GridManager : Node2D
 {
     // Hashset to track living cells
-    // One for each type of life?
-    private HashSet<Vector2I> occupiedCells = new();
+    public HashSet<Vector2I> occupiedCells = new();
 
     // Store each life in a dictionary with its coords for easy access
     public Dictionary<Vector2I, Node2D> gridLife = new();
 
     private PackedScene lifeScene;
+    private PackedScene lifeSceneSolitary;
+    private PackedScene lifeSceneSocial;
     private Node2D mainNode;
-    private List<Vector2I> nextGenerationLifeCoords = new();
-    private List<Vector2I> nextGenerationDeathCoords = new();
+    private LifeManager lifeManager;
+    public List<Vector2I> nextGenerationLifeCoords = new();
+    public List<Vector2I> nextGenerationDeathCoords = new();
 
     [Export]
-    private TileMapLayer baseTerrainTileMapLayer;
+    public TileMapLayer baseTerrainTileMapLayer;
 
     public override void _Ready()
     {
         base._Ready();
-        lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
+        lifeScene = GD.Load<PackedScene>("res://scenes/life/LifeAverage.tscn");
+        lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
+        lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
         mainNode = GetNode<Node2D>("/root/Main");
+        lifeManager = GetNode<LifeManager>("/root/Main/GridManager/LifeManager");
     }
 
 
@@ -56,151 +57,4 @@ public partial class GridManager : Node2D
     {
         occupiedCells.Remove(tilePosition);
     }
-
-    #region Life Management
-    public void IterateLifeGrid()
-    {
-        // Iterate grid
-        for (int i = 0; i < baseTerrainTileMapLayer.GetUsedRect().Size.X; i++)
-        {
-            for (int j = 0; j < baseTerrainTileMapLayer.GetUsedRect().Size.Y; j++)
-            {
-                Vector2I position = new Vector2I(i, j);
-                // GD.Print("Position: ", position);
-                int livingNeighbors = AssessNeighbors(position);
-                CalculateNextGeneration(livingNeighbors, position);
-            }
-        }
-
-        UpdateGeneration();
-    }
-
-    // Check neighbors for life
-    public int AssessNeighbors(Vector2I currentGridPosition)
-    {
-        // Neighbor cell positions
-        // GD.Print("Judging neighbors...");
-
-        // Iterate all 8 neighbors to be evaluated
-        List<TileSet.CellNeighbor> neighbors = [
-            TileSet.CellNeighbor.RightSide,
-            TileSet.CellNeighbor.BottomRightCorner,
-            TileSet.CellNeighbor.BottomSide,
-            TileSet.CellNeighbor.BottomLeftCorner,
-            TileSet.CellNeighbor.LeftSide,
-            TileSet.CellNeighbor.TopLeftCorner,
-            TileSet.CellNeighbor.TopSide,
-            TileSet.CellNeighbor.TopRightCorner
-        ];
-
-        int livingNeighbors = 0;
-        foreach (TileSet.CellNeighbor neighbor in neighbors)
-        {
-            var cell = baseTerrainTileMapLayer.GetNeighborCell(currentGridPosition, neighbor);
-
-            // Is the neighbor alive?
-            if (IsTileAlive(cell))
-            {
-                // GD.Print($"Neighbor {neighbor} Lives!");
-                // Add to list of living neighbor locations/coords
-                // Increment count of living neighbors
-                livingNeighbors++;
-            }
-        }
-
-        // GD.Print("Living neighbors: ", livingNeighbors);
-
-        return livingNeighbors;
-
-    }
-
-    // Change state
-    public void CalculateNextGeneration(int countLivingNeighbors, Vector2I selfCoord)
-    {
-        // GD.Print("selfCoord: ", selfCoord);
-        // GD.Print("Living neighbors: ", countLivingNeighbors);
-        // GD.Print("Tile is alive?: ", IsTileAlive(selfCoord));
-
-        // Rules for life
-        // if dead && livingNeighbors == 3: become alive
-        if (!IsTileAlive(selfCoord) && (countLivingNeighbors == 3))
-        // if (!IsTileAlive(selfCoord))
-        {
-            // GD.Print(selfCoord);
-            nextGenerationLifeCoords.Add(selfCoord);
-            // GD.Print("Condition 1");
-        }
-        // if alive && livingNeighbors == 2 or 3: remain alive
-        else if (IsTileAlive(selfCoord) && ((countLivingNeighbors == 2) || (countLivingNeighbors == 3)))
-        {
-            // Condition does nothing?
-            // GD.Print("Condition 2");
-            return;
-        }
-        // if alive && livingNeighbors < 2: die
-        else if (IsTileAlive(selfCoord) && (countLivingNeighbors < 2))
-        {
-            nextGenerationDeathCoords.Add(selfCoord);
-            // GD.Print("Condition 3");
-        }
-        // if alive && livingNeighbors > 3: die
-        else if (IsTileAlive(selfCoord) && (countLivingNeighbors > 3))
-        {
-            nextGenerationDeathCoords.Add(selfCoord);
-            // GD.Print("Condition 4");
-        }
-
-    }
-
-    private void UpdateGeneration()
-    {
-        foreach (Vector2I coord in nextGenerationLifeCoords)
-        {
-            PlaceLifeAtPosition(coord);
-        }
-
-        foreach (Vector2I coord in nextGenerationDeathCoords)
-        {
-            RemoveLifeAtPosition(coord);
-        }
-
-        nextGenerationLifeCoords.Clear();
-        nextGenerationDeathCoords.Clear();
-    }
-
-    // TODO: likely remove; this function performed by timer
-    private void IterateGeneration()
-    {
-        bool progress = true;
-        int generation = 0;
-        while (progress)
-        {
-            // TODO: Delay speed of iteration based on UI slider
-
-            generation++;
-            // generationDisplay.Text = generation.ToString();
-        }
-    }
-
-    private void PlaceLifeAtPosition(Vector2I gridPosition)
-    {
-        var life = lifeScene.Instantiate<Node2D>();
-        mainNode.AddChild(life);
-
-        life.GlobalPosition = gridPosition * 16;
-        MarkTileAsAlive(gridPosition, life);
-    }
-
-    private void RemoveLifeAtPosition(Vector2I gridPosition)
-    {
-        var key = gridPosition;
-        if (gridLife.ContainsKey(key))
-        {
-            Node2D life = gridLife[key];
-            life.QueueFree();
-            gridLife.Remove(key);
-            MarkTileAsDead(key);
-        }
-    }
-    #endregion
 }

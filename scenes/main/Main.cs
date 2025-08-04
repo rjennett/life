@@ -1,38 +1,53 @@
 using Godot;
-using System;
 
 public partial class Main : Node2D
 {
+    // Life scenes
     private PackedScene lifeTypeToPlace;
     private PackedScene lifeScene;
     private PackedScene lifeSceneSolitary;
     private PackedScene lifeSceneSocial;
+
+    // Managers
     private GridManager gridManager;
+    private LifeManager lifeManager;
+
+    // Store cell coordinates of mouse position
     private Vector2I? hoveredGridCell;
+
+    // UI Buttons
     private Button buttonPlay;
     private Button buttonPause;
     private Button buttonReset;
     private Button buttonAverage;
     private Button buttonSolitary;
     private Button buttonSocial;
+
+    // Timer
     private Timer lifeTimer;
-    private string lifeType;
 
     public override void _Ready()
     {
         base._Ready();
 
         // Initialize scenes and nodes to be accessed programmatically
-        lifeScene = GD.Load<PackedScene>("res://scenes/life/Life.tscn");
+        lifeScene = GD.Load<PackedScene>("res://scenes/life/LifeAverage.tscn");
         lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
         lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
+
+        //Managers
         gridManager = GetNode<GridManager>("GridManager");
+        lifeManager = GetNode<LifeManager>("GridManager/LifeManager");
+
+        // UI Buttons
         buttonPlay = GetNode<Button>("UiRoot/ButtonPlay");
         buttonPause = GetNode<Button>("UiRoot/ButtonPause");
         buttonReset = GetNode<Button>("UiRoot/ButtonReset");
         buttonAverage = GetNode<Button>("UiRoot/ButtonAverage");
         buttonSolitary = GetNode<Button>("UiRoot/ButtonSolitary");
         buttonSocial = GetNode<Button>("UiRoot/ButtonSocial");
+
+        // Timer to control generation iteration
         lifeTimer = GetNode<Timer>("LifeTimer");
 
         // Control game timer
@@ -48,13 +63,15 @@ public partial class Main : Node2D
             }
         };
         buttonPause.Pressed += () => lifeTimer.Paused = true;
-        lifeTimer.Timeout += () => gridManager.IterateLifeGrid();
+        buttonReset.Pressed += () => resetLife();
+
+        lifeTimer.Timeout += () => lifeManager.IterateLifeNodes();
 
         // Set type of life to be placed
         buttonAverage.Pressed += () => lifeTypeToPlace = lifeScene;
         buttonSolitary.Pressed += () => lifeTypeToPlace = lifeSceneSolitary;
         buttonSocial.Pressed += () => lifeTypeToPlace = lifeSceneSocial;
-        
+
     }
 
     public override void _UnhandledInput(InputEvent evt)
@@ -71,7 +88,7 @@ public partial class Main : Node2D
             RemoveLifeAtHoveredCellPosition();
         }
     }
-    
+
 
     // Executes every frame
     public override void _Process(double delta)
@@ -83,11 +100,27 @@ public partial class Main : Node2D
 
     }
 
-    // TODO: refactor to place life at argument position for use elsewhere
     private void PlaceLifeAtHoveredCellPosition()
     {
         var life = lifeTypeToPlace.Instantiate<Node2D>();
-        AddChild(life);
+        lifeManager.AddChild(life);
+
+        if (lifeTypeToPlace == lifeScene)
+        {
+            life.AddToGroup("average");
+        }
+        else if (lifeTypeToPlace == lifeSceneSolitary)
+        {
+            life.AddToGroup("solitary");
+        }
+        else if (lifeTypeToPlace == lifeSceneSocial)
+        {
+            life.AddToGroup("social");
+        }
+        else
+        {
+            GD.Print("error with grouping");
+        }
 
         // Position converted to global values
         life.GlobalPosition = hoveredGridCell.Value * 16;
@@ -107,14 +140,10 @@ public partial class Main : Node2D
             gridManager.MarkTileAsDead(key);
         }
     }
-    
-    public void SetLifeType(string lifeType)
-    {
-        switch (lifeType)
-        {
-            case "Average":
 
-                break;
-        }
+    // Remove all the life nodes to reset the board
+    private void resetLife()
+    {
+        GetTree().ReloadCurrentScene();
     }
 }
