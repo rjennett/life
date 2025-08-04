@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 
@@ -112,7 +113,7 @@ public partial class LifeManager : Node2D
 
         foreach (var item in uniquePositions)
         {
-            GD.Print($"Item: {item.Item}, Count: {item.Count}");
+            // GD.Print($"Item: {item.Item}, Count: {item.Count}");
             if (item.Count == 3)
             {
                 gridManager.nextGenerationLifeCoords.Add(item.Item);
@@ -135,28 +136,105 @@ public partial class LifeManager : Node2D
     #region Workers
 
     // Get neighborhood of node position and find most common neighbor type
-    // private Node2D calculateMostCommonNeighbor(Vector2I currentGridPosition, TileMapLayer baseTerrainTileMapLayer)
-    // {
-    //     // Initialize new list for neighbor positions
-    //     List<Vector2I> neighborhood = new();
+    private string calculateMostCommonNeighbor(Vector2I currentGridPosition, TileMapLayer baseTerrainTileMapLayer)
+    {
+        // Initialize new list for neighbor positions
+        List<Vector2I> neighborhood = new();
 
-    //     // Iterate all 8 neighbors to be evaluated
-    //     List<TileSet.CellNeighbor> neighbors = [
-    //         TileSet.CellNeighbor.RightSide,
-    //         TileSet.CellNeighbor.BottomRightCorner,
-    //         TileSet.CellNeighbor.BottomSide,
-    //         TileSet.CellNeighbor.BottomLeftCorner,
-    //         TileSet.CellNeighbor.LeftSide,
-    //         TileSet.CellNeighbor.TopLeftCorner,
-    //         TileSet.CellNeighbor.TopSide,
-    //         TileSet.CellNeighbor.TopRightCorner
-    //     ];
+        // Initialize group string to return
+        string mostCommonGroup;
 
-    //     foreach (TileSet.CellNeighbor neighbor in neighbors)
-    //     {
-            
-    //     }
-    // }
+        // Counts for each group type
+        int countAverage = 0;
+        int countSolitary = 0;
+        int countSocial = 0;
+
+        // Iterate all 8 neighbors to be evaluated
+        List<TileSet.CellNeighbor> neighbors = [
+            TileSet.CellNeighbor.RightSide,
+            TileSet.CellNeighbor.BottomRightCorner,
+            TileSet.CellNeighbor.BottomSide,
+            TileSet.CellNeighbor.BottomLeftCorner,
+            TileSet.CellNeighbor.LeftSide,
+            TileSet.CellNeighbor.TopLeftCorner,
+            TileSet.CellNeighbor.TopSide,
+            TileSet.CellNeighbor.TopRightCorner
+        ];
+
+        foreach (TileSet.CellNeighbor neighbor in neighbors)
+        {
+            // Divide node position by 16 to get correct coordintes for TileMapLayer neighbors
+            Vector2I neighborPosition = baseTerrainTileMapLayer.GetNeighborCell(currentGridPosition, neighbor);
+
+            // Add the neighbor position to the neighborhood list
+            neighborhood.Add(neighborPosition);
+        }
+
+        foreach (Vector2I position in neighborhood)
+        {
+            GD.Print("+ + + + + + + + + +", position);
+        }
+
+        foreach (Node2D child in GetChildren())
+        {
+            foreach (Vector2I position in neighborhood)
+            {
+                Vector2I childPosition = (Vector2I)child.Position;
+
+                // Store the group a node belongs to. These nodes will only ever belong to one group, hence [0]
+                var nodeLifeType = child.GetGroups()[0];
+                GD.Print(nodeLifeType);
+
+                GD.Print("CHILD POSITION: ", childPosition / 16);
+                GD.Print("NEIGHBOR POSITION: ", position);
+
+                // If true, the node is at the position of the neighbor
+                if ((childPosition / 16) == position)
+                {
+                    if (child.IsInGroup("average"))
+                    {
+                        countAverage++;
+                    }
+                    else if (child.IsInGroup("solitary"))
+                    {
+                        countSolitary++;
+                    }
+                    else if (child.IsInGroup("social"))
+                    {
+                        countSocial++;
+                    }
+                    // If there is no node at the neighbor position
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        GD.Print("Average", countAverage);
+        GD.Print("Solitary", countSolitary);
+        GD.Print("Social", countSocial);
+
+        List<int> counts = new List<int> { countAverage, countSolitary, countSocial };
+        int maxGroup = counts.Max();
+
+        // Convert max count to string groups
+        if (maxGroup == countAverage)
+        {
+            mostCommonGroup = "average";
+        }
+        else if (maxGroup == countSolitary)
+        {
+            mostCommonGroup = "solitary";
+        }
+        else
+        {
+            mostCommonGroup = "social";
+        }
+
+        return mostCommonGroup;
+    }
 
     // Check neighbors for life
     public (int countLivingNeighbors, List<Vector2I> neighborhood) AssessNeighbors(Vector2I currentGridPosition, TileMapLayer baseTerrainTileMapLayer)
@@ -235,6 +313,10 @@ public partial class LifeManager : Node2D
 
     private void PlaceLifeAtPosition(Vector2I gridPosition)
     {
+        string mostCommonNeighborGroup;
+        // Get the neighborhood of the life node
+        mostCommonNeighborGroup = calculateMostCommonNeighbor(gridPosition, gridManager.baseTerrainTileMapLayer);
+        
         // Randomly select the new life type
         List<int> types = new List<int> { 0, 1, 2 };
         Random random = new();
@@ -244,17 +326,17 @@ public partial class LifeManager : Node2D
         string group;
 
         // Initialize the packed scene to use as the Node2D for new life
-        switch (randomType)
+        switch (mostCommonNeighborGroup)
         {
-            case 0:
+            case "average":
                 life = lifeScene.Instantiate<Node2D>();
                 group = "average";
                 break;
-            case 1:
+            case "social":
                 life = lifeSceneSocial.Instantiate<Node2D>();
                 group = "social";
                 break;
-            case 2:
+            case "solitary":
                 life = lifeSceneSolitary.Instantiate<Node2D>();
                 group = "solitary";
                 break;

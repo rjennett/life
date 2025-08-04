@@ -48,6 +48,7 @@ public partial class GridManager : Node2D
     // Check for life
     public bool IsTileAlive(Vector2I tilePosition)
     {
+        GD.Print("is alive tile position", tilePosition);
         return occupiedCells.Contains(tilePosition);
     }
 
