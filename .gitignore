@@ -1,3 +1,6 @@
+# Project specific ignores
+/builds
+
 # Godot 4+ specific ignores
 .godot/
 /android/
