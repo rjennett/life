@@ -1,13 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading;
 
 public partial class LifeManager : Node2D
 {
-    private RichTextLabel generationDisplay;
     private PackedScene lifeScene;
     private PackedScene lifeSceneSolitary;
     private PackedScene lifeSceneSocial;
@@ -21,7 +18,6 @@ public partial class LifeManager : Node2D
         lifeScene = GD.Load<PackedScene>("res://scenes/life/LifeAverage.tscn");
         lifeSceneSolitary = GD.Load<PackedScene>("res://scenes/life/LifeSolitary.tscn");
         lifeSceneSocial = GD.Load<PackedScene>("res://scenes/life/LifeSocial.tscn");
-        // generationDisplay = GetNode<RichTextLabel>("UserInterface/GenerationDisplay");
         gridManager = GetNode<GridManager>("../");
     }
 
@@ -36,7 +32,6 @@ public partial class LifeManager : Node2D
             
             // Store the group a node belongs to. These nodes will only ever belong to one group, hence [0]
             var nodeLifeType = child.GetGroups()[0];
-            GD.Print(nodeLifeType);
             
             // Get the neighborhood of the life node
             var neighborhoodInfo = AssessNeighbors(childPosition, gridManager.baseTerrainTileMapLayer);
@@ -48,15 +43,11 @@ public partial class LifeManager : Node2D
                 if (neighborhoodInfo.countLivingNeighbors < 2)
                 {
                     // This node will die next generation during update
-
-                    GD.Print("This node will die by UNDER: ", childPosition);
                     gridManager.nextGenerationDeathCoords.Add(childPosition);
                 }
                 else if (neighborhoodInfo.countLivingNeighbors > 3)
                 {
                     // This node will die next generation during update
-
-                    GD.Print("This node will die by OVER: ", childPosition);
                     gridManager.nextGenerationDeathCoords.Add(childPosition);
                 }
                 else
@@ -90,39 +81,19 @@ public partial class LifeManager : Node2D
             // Add current neighborhood to list of neighborhoods
             listOfNeighborhoods.Add(neighborhoodInfo.neighborhood);
         }
-        // foreach (var list in listOfNeighborhoods)
-        // {
-        //     foreach (var item in list)
-        //     {
-        //         GD.Print(item);
-        //     }
-        // }
-        foreach (var item in gridManager.nextGenerationDeathCoords)
-        {
-            GD.Print("next gen death: ", item);
-        }
-        GD.Print("- - - - - - - - - ");
-
 
         // Compare neighborhoods from all children to locate new life
-        // Needs to contain information about which type of life the neighborhood came from
-        // Start by placing average life every time, update later 
         var uniquePositions = listOfNeighborhoods.SelectMany(l => l)
             .GroupBy(item => item)
             .Select(group => new { Item = group.Key, Count = group.Count() });
 
         foreach (var item in uniquePositions)
         {
-            // GD.Print($"Item: {item.Item}, Count: {item.Count}");
             if (item.Count == 3)
             {
                 gridManager.nextGenerationLifeCoords.Add(item.Item);
             }
         }
-
-        // Store type of life at each position from current generation
-
-        // Calculate the next generation
 
         // Update the generation
         UpdateGeneration();
@@ -170,11 +141,6 @@ public partial class LifeManager : Node2D
             neighborhood.Add(neighborPosition);
         }
 
-        foreach (Vector2I position in neighborhood)
-        {
-            GD.Print("+ + + + + + + + + +", position);
-        }
-
         foreach (Node2D child in GetChildren())
         {
             foreach (Vector2I position in neighborhood)
@@ -183,10 +149,6 @@ public partial class LifeManager : Node2D
 
                 // Store the group a node belongs to. These nodes will only ever belong to one group, hence [0]
                 var nodeLifeType = child.GetGroups()[0];
-                GD.Print(nodeLifeType);
-
-                GD.Print("CHILD POSITION: ", childPosition / 16);
-                GD.Print("NEIGHBOR POSITION: ", position);
 
                 // If true, the node is at the position of the neighbor
                 if ((childPosition / 16) == position)
@@ -212,10 +174,6 @@ public partial class LifeManager : Node2D
             }
         }
 
-        GD.Print("Average", countAverage);
-        GD.Print("Solitary", countSolitary);
-        GD.Print("Social", countSocial);
-
         List<int> counts = new List<int> { countAverage, countSolitary, countSocial };
         int maxGroup = counts.Max();
 
@@ -239,9 +197,6 @@ public partial class LifeManager : Node2D
     // Check neighbors for life
     public (int countLivingNeighbors, List<Vector2I> neighborhood) AssessNeighbors(Vector2I currentGridPosition, TileMapLayer baseTerrainTileMapLayer)
     {
-        // Neighbor cell positions
-        GD.Print("Assessing neighbors for ", currentGridPosition);
-
         // Initialize new list for neighbor positions
         List<Vector2I> neighborhood = new();
 
@@ -266,8 +221,6 @@ public partial class LifeManager : Node2D
             // Is the neighbor alive?
             if (gridManager.IsTileAlive(neighborPosition))
             {
-                GD.Print($"Neighbor {neighbor} Lives!");
-                // Add to list of living neighbor locations/coords
                 // Increment count of living neighbors
                 livingNeighbors++;
             }
@@ -276,17 +229,11 @@ public partial class LifeManager : Node2D
             neighborhood.Add(neighborPosition);
         }
 
-        GD.Print("Living neighbors: ", livingNeighbors);
-
         return (livingNeighbors, neighborhood);
-
     }
 
     private void UpdateGeneration()
     {
-        GD.Print("Next Life");
-        gridManager.nextGenerationLifeCoords.ForEach(item => GD.Print(item));
-
         foreach (Vector2I coord in gridManager.nextGenerationLifeCoords)
         {
             if (!gridManager.IsTileAlive(coord))
@@ -298,9 +245,6 @@ public partial class LifeManager : Node2D
                 GD.Print("Tile was already living!");
             }
         }
-
-        GD.Print("Next Death");
-        gridManager.nextGenerationDeathCoords.ForEach(item => GD.Print(item));
 
         foreach (Vector2I coord in gridManager.nextGenerationDeathCoords)
         {
@@ -368,5 +312,4 @@ public partial class LifeManager : Node2D
     }
 
     #endregion
-
 }

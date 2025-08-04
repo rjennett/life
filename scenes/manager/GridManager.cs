@@ -1,14 +1,9 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading;
 
 public partial class GridManager : Node2D
 {
     // Hashset to track living cells
-    // One for each type of life?
     public HashSet<Vector2I> occupiedCells = new();
 
     // Store each life in a dictionary with its coords for easy access
@@ -48,7 +43,6 @@ public partial class GridManager : Node2D
     // Check for life
     public bool IsTileAlive(Vector2I tilePosition)
     {
-        GD.Print("is alive tile position", tilePosition);
         return occupiedCells.Contains(tilePosition);
     }
 
