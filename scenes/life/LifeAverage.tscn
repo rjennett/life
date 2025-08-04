@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dnedk1gvvm5c" path="res://scenes/world/Basic_Grass_Biom_things.png" id="1_nilks"]
 
-[node name="Life" type="Node2D"]
+[node name="LifeAverage" type="Node2D"]
 
 [node name="Average" type="Sprite2D" parent="."]
 texture = ExtResource("1_nilks")
