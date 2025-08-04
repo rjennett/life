@@ -11,5 +11,4 @@ This project aims to recreate at a small scale the cellular automaton The Game o
 This version of The Game of Life runs in a more limited space than the original. The available grid for this game is 20x20 cells. Also, in addition to the standard life that follows Conways ruleset, there are two additional varieties of life included here. Those are Solitary and Social, and here the original variety is referred to as Average.
 
 ## How to Play
-
-
+![](https://raw.githubusercontent.com/rjennett/life/refs/heads/main/media/life-demo.gif)
