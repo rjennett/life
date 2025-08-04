@@ -64,13 +64,15 @@ public partial class Main : Node2D
             }
         };
         buttonPause.Pressed += () => lifeTimer.Paused = true;
+        buttonReset.Pressed += () => resetLife();
+
         lifeTimer.Timeout += () => lifeManager.IterateLifeNodes();
 
         // Set type of life to be placed
         buttonAverage.Pressed += () => lifeTypeToPlace = lifeScene;
         buttonSolitary.Pressed += () => lifeTypeToPlace = lifeSceneSolitary;
         buttonSocial.Pressed += () => lifeTypeToPlace = lifeSceneSocial;
-        
+
     }
 
     public override void _UnhandledInput(InputEvent evt)
@@ -87,7 +89,7 @@ public partial class Main : Node2D
             RemoveLifeAtHoveredCellPosition();
         }
     }
-    
+
 
     // Executes every frame
     public override void _Process(double delta)
@@ -138,5 +140,11 @@ public partial class Main : Node2D
             gridManager.gridLife.Remove(key);
             gridManager.MarkTileAsDead(key);
         }
+    }
+
+    // Remove all the life nodes to reset the board
+    private void resetLife()
+    {
+        GetTree().ReloadCurrentScene();
     }
 }

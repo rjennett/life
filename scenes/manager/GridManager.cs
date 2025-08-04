@@ -9,7 +9,7 @@ public partial class GridManager : Node2D
 {
     // Hashset to track living cells
     // One for each type of life?
-    private HashSet<Vector2I> occupiedCells = new();
+    public HashSet<Vector2I> occupiedCells = new();
 
     // Store each life in a dictionary with its coords for easy access
     public Dictionary<Vector2I, Node2D> gridLife = new();
