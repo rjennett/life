@@ -12,3 +12,16 @@ This version of The Game of Life runs in a more limited space than the original.
 
 ## How to Play
 ![](https://raw.githubusercontent.com/rjennett/life/refs/heads/main/media/life-demo.gif)
+
+Select which type of life to place on the board, then press play. Pause any time to add more life. 
+
+Each type of life follows different rules:
+| Life Type | Lives | Dies |
+| --- | --- | --- |
+| Average | 2 or 3 live neighbors | Fewer than 2 or greater than 3 live neighbors |
+| Solitary | 1 or 2 live neighbors | Fewer than 1 or greater than 2 live neighbors |
+| Social | 3 or 4 live neighbors | Fewer than 3 or greater than 4 live neighbors |
+
+## Attributions
+
+This project uses assets from the free license of the lovely Sprout Lands asset pack created generously shared by [Cup Nooble](https://cupnooble.itch.io/).
