@@ -24,4 +24,4 @@ Each type of life follows different rules:
 
 ## Attributions
 
-This project uses assets from the free license of the lovely Sprout Lands asset pack created generously shared by [Cup Nooble](https://cupnooble.itch.io/).
+This project uses assets from the free license of the lovely Sprout Lands asset pack created and generously shared by [Cup Nooble](https://cupnooble.itch.io/).
